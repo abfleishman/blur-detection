@@ -6,10 +6,10 @@ import sys
 import csv
 import os
 
-def variance_of_laplacian(image):
+def variance_of_laplacian(image,kernal_size ):
 	# compute the Laplacian of the image and then return the focus
 	# measure, which is simply the variance of the Laplacian
-	return cv2.Laplacian(image, cv2.CV_64F,ksize = 5).var()
+	return cv2.Laplacian(image, cv2.CV_64F,ksize = kernal_size).var()
  
 # construct the argument parse and parse the arguments
 ap = argparse.ArgumentParser()
@@ -17,6 +17,8 @@ ap.add_argument("-i", "--images", required=True,
 	help="path to input directory of images")
 ap.add_argument("-t", "--threshold", type=float, default=100.0,
 	help="focus measures that fall below this value will be considered 'blurry'")
+ap.add_argument("-k", "--ksize", type=int, default=1,
+	help="kernal size, odd values only!!!")
 ap.add_argument("-o", "--out_csv_path", default = os.path.join(os.getcwd(),"test.csv"),
 	help="full path to csv file to be created and saved with output")
 	
@@ -37,7 +39,7 @@ for imagePath in paths.list_images(args["images"]):
 	# method
 	image = cv2.imread(imagePath)
 	gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-	fm = variance_of_laplacian(gray).round(2)
+	fm = variance_of_laplacian(gray,kernal_size=args["ksize"]).round(2)
 
 	if fm > args["threshold"]:
 		text = imagePath+" - Not Blurry: "+str(fm)
